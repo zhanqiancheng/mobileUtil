@@ -1,0 +1,150 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>mobileUtil</title>
+    <meta name="description" content="">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <!-- <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1"> -->
+    <!-- <meta name="viewport" content="target-densitydpi=device-dpi,width=750"> -->
+    <script type="text/javascript"> 
+        /**
+         * 根据两种情况适配
+         * 1、rem：不需要写meta标签
+         * 2、定宽：meta标签写法 -- <meta name="viewport" content="target-densitydpi=device-dpi,width=750">  width设定为设计稿的宽度
+         *
+         * mobileUtil.isAndroid -- 判断安卓设备
+         * mobileUtil.isIos -- 判断苹果设备
+         * mobileUtil.dpr -- 返回设备的dpr
+         * mobileUtil.rem2px(val) -- 将rem转换成px
+         * mobileUtil.px2rem(val) -- 将px转换成rem
+         */
+        var mobileUtil = (function(win, doc){
+            var UA = navigator.userAgent,
+                isAndroid = /android|adr/gi.test(UA),
+                isIos = /iphone|ipod|ipad/gi.test(UA) && !isAndroid, // 据说某些国产机的UA会同时包含 android iphone 字符
+                isMobile = isAndroid || isIos;  // 粗略的判断
+            return {
+                isAndroid: isAndroid,
+                isIos: isIos,
+                isMobile: isMobile,
+                clickEvent: isMobile ? 'tap' : 'click',
+
+                // 页面缩放
+                fixScreen: function(){
+                    var metaEl = doc.querySelector('meta[name="viewport"]'),
+                        metaCtt = metaEl ? metaEl.content : '',
+                        matchScale = metaCtt.match(/initial\-scale=([\d\.]+)/),
+                        matchWidth = metaCtt.match(/width=([^,\s]+)/),
+                        docEl = doc.documentElement,
+                        dpr = 0,
+                        scale = 0,
+                        tid,
+                        self = this;
+                    if (!metaEl) { // rem
+                        var devicePixelRatio = win.devicePixelRatio;
+                        var isIntDpr = devicePixelRatio.toString().match(/^[1-9]\d*$/g);
+                        // 只在dpr为整数的时候设置dpr
+                        if(isIntDpr){
+                            if (devicePixelRatio >= 3 && (!dpr || dpr >= 3)) {
+                                dpr = 3;
+                            } else if (devicePixelRatio >= 2 && (!dpr || dpr >= 2)){
+                                dpr = 2;
+                            } else {
+                                dpr = 1;
+                            }
+                        }else{
+                            dpr = 1;
+                        }
+                        scale = 1 / dpr;
+                        docEl.setAttribute('data-dpr', dpr);
+                        metaEl = doc.createElement('meta');
+                        metaEl.setAttribute('name', 'viewport');
+                        metaEl.content = fillScale(scale);
+                        if (docEl.firstElementChild) {
+                            docEl.firstElementChild.appendChild(metaEl);
+                        } else {
+                            var wrap = doc.createElement('div');
+                            wrap.appendChild(metaEl);
+                            doc.write(wrap.innerHTML);
+                        }
+                        var refreshRem = function(){
+                            var width = docEl.getBoundingClientRect().width;
+                            if (width / dpr > 540) {
+                                width = 540 * dpr;
+                            }
+                            var rem = width / 10;
+                            docEl.style.fontSize = rem + 'px';
+                            self.rem = win.rem = rem;
+                        }
+                        win.addEventListener('resize', function() {
+                            clearTimeout(tid);
+                            tid = setTimeout(refreshRem, 300);
+                        }, false);
+                        win.addEventListener('pageshow', function(e) {
+                            if (e.persisted) {
+                                clearTimeout(tid);
+                                tid = setTimeout(refreshRem, 300);
+                            }
+                        }, false);
+
+                        if (doc.readyState === 'complete') {
+                            doc.body.style.fontSize = 12 * dpr + 'px';
+                        } else {
+                            doc.addEventListener('DOMContentLoaded', function(e) {
+                                doc.body.style.fontSize = 12 * dpr + 'px';
+                            }, false);
+                        }
+                        refreshRem();
+
+                        self.dpr = win.dpr = dpr;
+                        self.rem2px = function(d){
+                            var val = parseFloat(d) * this.rem;
+                            if(typeof d === 'string' && d.match(/rem$/)){
+                                val += 'px';
+                            }
+                            return val;
+                        }
+                        self.px2rem = function(d){
+                            var val = parseFloat(d) / this.rem;
+                            if(typeof d === 'string' && d.match(/px$/)){
+                                val += 'rem';
+                            }
+                            return val;
+                        }
+                    }else if(isMobile && !matchScale && ( matchWidth && matchWidth[1] != 'device-width' )){ // 定宽方法 
+                        var width = parseInt(matchWidth[1]),
+                            iw = win.innerWidth || width,
+                            ow = win.outerWidth || iw,
+                            sw = win.screen.width || iw,
+                            saw = win.screen.availWidth || iw,
+                            ih = win.innerHeight || width,
+                            oh = win.outerHeight || ih,
+                            ish = win.screen.height || ih,
+                            sah = win.screen.availHeight || ih,
+                            w = Math.min(iw,ow,sw,saw,ih,oh,ish,sah),
+                            scale = w / width;
+                        if ( scale < 1 ) {
+                            metaEl.content = metaCtt + ',' + fillScale(scale);
+                        }
+                    }
+                }
+            }
+            function fillScale(scale){
+                return 'initial-scale=' + scale + ',maximum-scale=' + scale + ',minimum-scale=' + scale;
+            }
+        })(window, document);
+        mobileUtil.fixScreen();
+    </script>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+</head>
+<body>
+    <div class="container">
+        <ul>
+            <li>mobileUtil</li>
+            <li>mobileUtil</li>
+            <li>mobileUtil</li>
+        </ul>
+    </div>
+</body>
+</html>

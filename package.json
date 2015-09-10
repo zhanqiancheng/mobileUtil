@@ -1,0 +1,16 @@
+{
+  "name": "mobileUtil",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "zhanqiancheng",
+  "license": "",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-compass": "^2.1.0"
+  }
+}

@@ -1,0 +1,32 @@
+@charset "UTF-8";
+// 雪碧图
+
+// 獲取icon圖相關
+@mixin getIconPath($icons){
+	background-image: sprite-url($icons);
+	background-repeat: no-repeat;
+	background-position-y: 0;
+	@include px2px(background-size, floor(image-width(sprite-path($icons))));
+}
+%getIconsPath{
+	display: block;
+	@include getIconPath($icons);
+}
+@mixin getIcon($iconName, $active: false){
+	$posX: ceil(nth(sprite-position($icons, $iconName), 1));
+	$w: image-width(sprite-file($icons, $iconName));
+	$h: image-height(sprite-file($icons, $iconName));
+	$map: (
+		width: $w,
+		height: $h,
+		background-position-x: $posX
+	);
+	@if $active == true{
+		$map: (
+			background-position-x: $posX
+		);
+	}
+	
+	@include pxs2px($maps: $map);
+	@extend %getIconsPath;
+}
