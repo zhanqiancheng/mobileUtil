@@ -6,7 +6,7 @@
 不用写 meta 标签，该方法根据 dpr 自动生成meta viewport标签，并在 html 标签中加上 `data-dpr` 和 `font-size` 两个属性值（[手淘自适应方案](https://github.com/amfe/lib-flexible)）
 ####2.定宽
 头部定义标签`<meta name="viewport" content="target-densitydpi=device-dpi,width=750">`，该方法会获取width，并自动计算scale值设置缩放
-####px2rem
+####关于rem方法
 #####如果使用rem做适配，则任何弹性尺寸均使用 rem 作为单位
 当前方案会把这3类视觉稿分成`100份`来看待。每一份被称为一个单位a。同时，1rem单位认定为10a。拿750的视觉稿举例：
 ``` html
