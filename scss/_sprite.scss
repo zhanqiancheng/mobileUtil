@@ -1,32 +1,23 @@
 @charset "UTF-8";
-// 雪碧图
-
-// 獲取icon圖相關
-@mixin getIconPath($icons){
+// 雪碧图处理
+%getIconsPath{
+	display: block;
 	background-image: sprite-url($icons);
 	background-repeat: no-repeat;
 	background-position-y: 0;
-	@include px2px(background-size, floor(image-width(sprite-path($icons))));
+	background-size: floor(image-width(sprite-path($icons)) / $ppr);
 }
-%getIconsPath{
-	display: block;
-	@include getIconPath($icons);
-}
-@mixin getIcon($iconName, $active: false){
-	$posX: ceil(nth(sprite-position($icons, $iconName), 1));
-	$w: image-width(sprite-file($icons, $iconName));
-	$h: image-height(sprite-file($icons, $iconName));
-	$map: (
-		width: $w,
-		height: $h,
-		background-position-x: $posX
-	);
-	@if $active == true{
-		$map: (
-			background-position-x: $posX
-		);
+@mixin getIcon($iconName){
+	$width: image-width(sprite-path($icons));
+	$iconWidth: image-width(sprite-file($icons, $iconName));
+	$iconHeight: image-height(sprite-file($icons, $iconName));
+	$posX: nth(sprite-position($icons, $iconName), 1);
+	width: $iconWidth / $ppr;
+	height: $iconHeight / $ppr;
+	@if $posX != 0{
+		background-position-x: $posX / ($iconWidth - $width) * 100%;
+	} @else{
+		background-position-x: 0;
 	}
-	
-	@include pxs2px($maps: $map);
 	@extend %getIconsPath;
 }
