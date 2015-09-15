@@ -64,6 +64,9 @@ sprite图合并基于compass
 
 
 之前尝试background-position用rem会出现定位错位情况，所以之后还是用回px去设置sprite图的background-position，和设置字体一样，根据data-dpr去设置不同dpr下的位置，核心代码如下：
+
+
+注：这也是不推荐的方法，只是拿出来说明一下，最后附有解决方法
 ``` scss
 %getIconsPath{
 	display: block;
