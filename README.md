@@ -61,6 +61,7 @@ a{
 ```
 #####sprite图定位处理
 sprite图合并基于compass
+---------------------------
 之前尝试background-position用rem会出现定位错位情况，所以之后还是用回px去设置sprite图的background-position，和设置字体一样，根据data-dpr去设置不同dpr下的位置，核心代码如下：
 ``` scss
 %getIconsPath{
@@ -144,9 +145,9 @@ a {
 }
 ```
 这种方法有缺陷，我们用rem布局的初衷就是想做自适应，用px的话虽然不会有错位问题，但没法做自适应，而且编译后的代码量太大，要是图标多的话生成的css文件大小简直惊人。
->
+---------------------------
 那么就没办法了么，别忘记background-position还可以根据百分比定位，原理可看[闲扯 background-position 的单位属性值](http://linxz.github.io/blog/css%E5%B1%9E%E6%80%A7%E5%9F%BA%E7%A1%80/2015/09/talk-about-background-position-values.html)
->
+---------------------------
 sass
 ``` sass
 %getIconsPath{
